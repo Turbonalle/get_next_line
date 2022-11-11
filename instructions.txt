@@ -1,0 +1,12 @@
+ssize_t read(int fd, void *buf, size_t nbyte);
+
+- Reads "n" bytes of data from the object referenced by "fd" into the buffer pointed to by "buf".
+
+- Returns:	- Amount of bytes read,
+			- 0 if end of file,
+			- -1 if there's an error.
+
+- If read() is called again on the same file:	- it will remember where the "cursor" is,
+												- it will overwrite the buf with the next "n" bytes.
+
+Thoughts: - If return size isn't the same as "n", the "cursor" has reached the end of file.
