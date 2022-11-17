@@ -107,22 +107,22 @@ static char	*ft_get_rest(char *buffer)
 	{
 		i++;
 	}
-	if (!buffer)
+	if (!buffer[i]) // Changed to check for eof instead of checking the whole buffer
 	{
 		free(buffer);
 		return (NULL);
 	}
-	j = 0;
-	while (buffer[j])
-		j++;
-	trimmed = ft_calloc(j - i, sizeof(char));
+	// j = 0;
+	// while (buffer[j])
+	// 	j++;
+	trimmed = ft_calloc(ft_strlen(buffer) - i + 1, sizeof(char)); // Changed to strlen instead of iterating with j, so i would save two lines. Also fixed miscalculation by adding one byte for ending char
 	if (!trimmed)
 		return (NULL);
 	i++;
 	j = 0;
 	while (buffer[i])
 		trimmed[j++] = buffer[i++];
-	trimmed[j] = '\0';
+	// trimmed[j] = '\0';	// Removed adding the terminating char
 	free(buffer);
 	return (trimmed);
 }
@@ -133,9 +133,11 @@ static char	*ft_get_line(char *buffer)
 	int		i;
 
 	i = 0;
+	if (!buffer[i])	// Added buffer check to avoid unnecessary steps if buffer is empty
+		return (NULL);
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
-	line = ft_calloc(i + 1, sizeof(char));
+	line = ft_calloc(i + 2, sizeof(char)); // Added one more byte for the terminating char. Had miscounted it...
 	if (!line)
 		return (NULL);
 	line[i + 1] = '\0';
@@ -145,7 +147,9 @@ static char	*ft_get_line(char *buffer)
 		line[i] = buffer[i];
 		i++;
 	}
-	line[i] = buffer[i];
+	if (buffer[i] && buffer[i] == '\n')
+		line[i++] = '\n';
+	// line[i] = buffer[i];
 	return (line);
 }
 
@@ -154,14 +158,17 @@ static char	*ft_read(char *result, int fd)
 	char	*buffer;
 	int		bytes_read;
 
+	if (!result) // Moved NULL-check here instead of gnl()
+		res = ft_calloc(1, 1);
 	buffer = ft_calloc(BUF_SIZE + 1, sizeof(char));
-	if (!buffer)
-		return (NULL);
+	// if (!buffer)	// This should not be needed, since we're accounting for (BUF_SIZE <= 0) in gnl()
+	// 	return (NULL);
 	bytes_read = 1;
 	while (bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUF_SIZE);
 		if (bytes_read < 0)
+			free(buffer); // Added freeing to avoid mem leak at eof
 			return (NULL);
 		buffer[bytes_read] = '\0';
 		result = ft_copy_and_free(result, buffer);
@@ -179,11 +186,11 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUF_SIZE <= 0 || read(fd, 0, 0) < 0)
 		return (0);
-	if (!buffer)
-	{
-		buffer = ft_calloc(1, 1);
-		buffer[0] = '\0';
-	}
+	// if (!buffer)
+	// {
+	// 	buffer = ft_calloc(1, 1);
+	// 	buffer[0] = '\0';
+	// }
 
 	buffer = ft_read(buffer, fd);
 	if (!buffer)
