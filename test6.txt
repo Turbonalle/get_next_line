@@ -1,6 +1,0 @@
-Test6, line 1.
-Test6, line 2.
-Test6, line 3.
-Test6, line 4.
-Test6, line 5.
-Test6, line 6.

@@ -1,15 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jbagger <jbagger@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 10:43:01 by jbagger           #+#    #+#             */
-/*   Updated: 2022/11/23 14:03:13 by jbagger          ###   ########.fr       */
+/*   Updated: 2022/11/19 15:42:25 by jbagger          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "get_next_line.h"
 
 static char	*ft_copy_and_free(char *buffer, char *add_to_end)
@@ -101,15 +107,15 @@ static char	*ft_read(char *result, int fd)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[1000];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 		return (0);
-	buffer = ft_read(buffer, fd);
-	if (!buffer)
+	buffer[fd] = ft_read(buffer[fd], fd);
+	if (!buffer[fd])
 		return (NULL);
-	line = ft_get_line(buffer);
-	buffer = ft_get_rest(buffer);
+	line = ft_get_line(buffer[fd]);
+	buffer[fd] = ft_get_rest(buffer[fd]);
 	return (line);
 }
